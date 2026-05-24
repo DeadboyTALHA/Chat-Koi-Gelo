@@ -4,7 +4,7 @@ export default function Home() {
   const navigate = useNavigate();
   return (
     <div className='min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-primary to-accent text-white px-4'>
-      <h1 className='text-5xl font-bold mb-4 text-center'>Vanish Chat</h1>
+      <h1 className='text-5xl font-bold mb-4 text-center'>Chat Koi Gelo</h1>
       <p className='text-xl text-center max-w-md mb-10'>
         Chat with your friends, family and your closed ones safely and securely.
       </p>

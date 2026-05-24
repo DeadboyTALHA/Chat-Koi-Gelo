@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const cookie = require('cookie');
+const User = require('../models/User');  // ADD THIS LINE
 const {
   getDMRoomId, addDMMessage, getDMMessages,
   addGroupMessage, getGroupMessages, flushUserMessages,
@@ -36,34 +37,68 @@ function initSocket(io) {
       socket.emit('group_history', { groupId, messages: msgs });
     });
 
-    // ── SEND DM ──
-    socket.on('send_dm', ({ toUserId, content }) => {
-      const message = {
-        from: userId,
-        content,
-        timestamp: new Date().toISOString(),
-      };
-      addDMMessage(userId, toUserId, message);
-      const roomId = getDMRoomId(userId, toUserId);
-      // Deliver to both participants
-      io.to(userId).to(toUserId).emit('receive_dm', { roomId, message });
+    // ── SEND DM ── (UPDATED)
+    socket.on('send_dm', async ({ toUserId, content }) => {
+      try {
+        // Get sender's username
+        const sender = await User.findById(userId).select('username fullName');
+        
+        const message = {
+          from: userId,
+          fromUsername: sender.username,
+          fromFullName: sender.fullName,
+          content,
+          timestamp: new Date().toISOString(),
+        };
+        addDMMessage(userId, toUserId, message);
+        const roomId = getDMRoomId(userId, toUserId);
+        // Deliver to both participants
+        io.to(userId).to(toUserId).emit('receive_dm', { roomId, message });
+      } catch (err) {
+        console.error('Error sending DM:', err);
+      }
     });
 
-    // ── REQUEST DM HISTORY ──
-    socket.on('get_dm_history', ({ withUserId }) => {
+    // ── REQUEST DM HISTORY ── (UPDATED)
+    socket.on('get_dm_history', async ({ withUserId }) => {
       const messages = getDMMessages(userId, withUserId);
-      socket.emit('dm_history', { withUserId, messages });
+      
+      // Enrich messages with usernames
+      const enrichedMessages = await Promise.all(messages.map(async (msg) => {
+        if (msg.fromUsername) return msg;
+        try {
+          const sender = await User.findById(msg.from).select('username fullName');
+          return {
+            ...msg,
+            fromUsername: sender?.username || msg.from,
+            fromFullName: sender?.fullName || msg.from
+          };
+        } catch (err) {
+          return msg;
+        }
+      }));
+      
+      socket.emit('dm_history', { withUserId, messages: enrichedMessages });
     });
 
-    // ── SEND GROUP MESSAGE ──
-    socket.on('send_group_msg', ({ groupId, content }) => {
-      const message = {
-        from: userId,
-        content,
-        timestamp: new Date().toISOString(),
-      };
-      addGroupMessage(groupId, message);
-      io.to('group:' + groupId).emit('receive_group_msg', { groupId, message });
+    // ── SEND GROUP MESSAGE ── (UPDATED - optional, for group chat usernames)
+    socket.on('send_group_msg', async ({ groupId, content }) => {
+      try {
+        // Get sender's username
+        const sender = await User.findById(userId).select('username fullName');
+        
+        const message = {
+          from: userId,
+          fromUsername: sender.username,
+          fromFullName: sender.fullName,
+          content,
+          timestamp: new Date().toISOString(),
+        };
+        addGroupMessage(groupId, message);
+        io.to('group:' + groupId).emit('receive_group_msg', { groupId, message });
+      } catch (err) {
+        console.error('Error sending group message:', err);
+      }
     });
 
     // ── TYPING INDICATORS ──

@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
 import { ChatProvider } from './context/ChatContext';
+import { ThemeProvider } from './context/ThemeContext';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -22,22 +23,24 @@ function PublicRoute({ children }) {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <SocketProvider>
-        <ChatProvider>
-          <BrowserRouter>
-            <Toaster position='top-right' />
-            <Routes>
-              <Route path='/' element={<PublicRoute><Home /></PublicRoute>} />
-              <Route path='/login' element={<PublicRoute><Login /></PublicRoute>} />
-              <Route path='/register' element={<PublicRoute><Register /></PublicRoute>} />
-              <Route path='/people' element={<PrivateRoute><YourPeople /></PrivateRoute>} />
-              <Route path='/chat/:type/:id' element={<PrivateRoute><Chat /></PrivateRoute>} />
-              <Route path='/notifications' element={<PrivateRoute><Notifications /></PrivateRoute>} />
-            </Routes>
-          </BrowserRouter>
-        </ChatProvider>
-      </SocketProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <SocketProvider>
+          <ChatProvider>
+            <BrowserRouter>
+              <Toaster position='top-right' />
+              <Routes>
+                <Route path='/' element={<PublicRoute><Home /></PublicRoute>} />
+                <Route path='/login' element={<PublicRoute><Login /></PublicRoute>} />
+                <Route path='/register' element={<PublicRoute><Register /></PublicRoute>} />
+                <Route path='/people' element={<PrivateRoute><YourPeople /></PrivateRoute>} />
+                <Route path='/chat/:type/:id' element={<PrivateRoute><Chat /></PrivateRoute>} />
+                <Route path='/notifications' element={<PrivateRoute><Notifications /></PrivateRoute>} />
+              </Routes>
+            </BrowserRouter>
+          </ChatProvider>
+        </SocketProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

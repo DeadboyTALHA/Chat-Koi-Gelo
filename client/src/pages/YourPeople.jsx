@@ -7,6 +7,8 @@ import { useChat } from '../context/ChatContext';
 import AddPeopleModal from '../components/people/AddPeopleModal';
 import CreateGroupModal from '../components/groups/CreateGroupModal';
 import PeopleCard from '../components/people/PeopleCard';
+import { Sun, Moon } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 export default function YourPeople() {
   const { user, logout } = useAuth();
@@ -16,6 +18,7 @@ export default function YourPeople() {
   const [groups, setGroups] = useState([]);
   const [showAdd, setShowAdd] = useState(false);
   const [showGroup, setShowGroup] = useState(false);
+  const { darkMode, toggleDarkMode } = useTheme();
 
   const fetchData = async () => {
     const [pRes, gRes] = await Promise.all([api.get('/people'), api.get('/groups')]);
@@ -24,6 +27,11 @@ export default function YourPeople() {
   };
 
   useEffect(() => { fetchData(); }, []);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
 
   return (
     <div className='min-h-screen bg-gray-50'>
@@ -41,7 +49,10 @@ export default function YourPeople() {
           </button>
           <button onClick={() => setShowAdd(true)}><UserPlus size={22} /></button>
           <button onClick={() => setShowGroup(true)}><Users size={22} /></button>
-          <button onClick={logout} className='text-sm bg-white text-primary px-3 py-1 rounded-full font-semibold'>
+          <button onClick={toggleDarkMode} className='text-white'>
+            {darkMode ? <Sun size={22} /> : <Moon size={22} />}
+          </button>
+          <button onClick={handleLogout} className='text-sm bg-white text-primary px-3 py-1 rounded-full font-semibold'>
             Logout
           </button>
         </div>

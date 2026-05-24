@@ -12,11 +12,43 @@
 
 .no-screenshot input, 
 .no-screenshot button, 
-.no-screenshot textarea,
-.no-screenshot [contenteditable="true"] {
+.no-screenshot textarea {
   pointer-events: auto;
 }
 
 body {
   @apply bg-gray-50 text-gray-900;
+}
+
+/* Dark mode styles */
+.dark body {
+  @apply bg-gray-900 text-gray-100;
+}
+
+.dark .bg-white {
+  @apply bg-gray-800;
+}
+
+.dark .bg-gray-50 {
+  @apply bg-gray-900;
+}
+
+.dark .bg-gray-100 {
+  @apply bg-gray-800;
+}
+
+.dark .text-gray-700,
+.dark .text-gray-800,
+.dark .text-gray-500 {
+  @apply text-gray-300;
+}
+
+.dark .border {
+  @apply border-gray-700;
+}
+
+.dark .shadow-sm,
+.dark .shadow-lg,
+.dark .shadow-xl {
+  --tw-shadow-color: #00000040;
 }
