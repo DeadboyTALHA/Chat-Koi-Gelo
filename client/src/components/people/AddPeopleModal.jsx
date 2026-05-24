@@ -24,30 +24,53 @@ export default function AddPeopleModal({ onClose }) {
 
   return (
     <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4'>
-      <div className='bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl'>
+      {/* MODAL CONTAINER - Added dark mode background */}
+      <div className='bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-sm shadow-xl'>
+        
         <div className='flex justify-between items-center mb-4'>
-          <h3 className='font-bold text-lg text-primary'>Add People</h3>
-          <X className='cursor-pointer' onClick={onClose} />
+          {/* HEADER TEXT - Added dark mode text color */}
+          <h3 className='font-bold text-lg text-primary dark:text-primary'>Add People</h3>
+          {/* CLOSE ICON - Added dark mode hover effect */}
+          <X className='cursor-pointer dark:text-gray-400 dark:hover:text-white' onClick={onClose} />
         </div>
+        
         <div className='flex gap-2 mb-4'>
-          <input className='flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent'
+          {/* INPUT - Already has dark mode classes */}
+          <input 
+            className='flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400'
             placeholder='Search by username...'
-            value={query} onChange={e => setQuery(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && search()} />
-          <button onClick={search} className='bg-accent text-white px-4 rounded-lg'>Go</button>
+            value={query} 
+            onChange={e => setQuery(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && search()} 
+          />
+          {/* SEARCH BUTTON - Added dark mode hover */}
+          <button 
+            onClick={search} 
+            className='bg-accent text-white px-4 rounded-lg hover:bg-primary transition-colors'
+          >
+            Go
+          </button>
         </div>
+        
         <div className='space-y-2 max-h-60 overflow-y-auto'>
           {results.map(u => (
-            <div key={u._id} className='flex items-center justify-between p-2 rounded-lg hover:bg-gray-50'>
+            // RESULT ITEM - Added dark mode hover and background
+            <div key={u._id} className='flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700'>
               <div>
-                <p className='font-medium'>{u.fullName}</p>
-                <p className='text-sm text-gray-500'>@{u.username}</p>
+                {/* NAME - Added dark mode text color */}
+                <p className='font-medium dark:text-white'>{u.fullName}</p>
+                {/* USERNAME - Added dark mode text color */}
+                <p className='text-sm text-gray-500 dark:text-gray-400'>@{u.username}</p>
               </div>
+              {/* ADD BUTTON - Already has good styling */}
               <button onClick={() => sendReq(u._id)}
-                className='bg-accent text-white text-sm px-3 py-1 rounded-full'>Add</button>
+                className='bg-accent text-white text-sm px-3 py-1 rounded-full hover:bg-primary transition-colors'>
+                Add
+              </button>
             </div>
           ))}
         </div>
+        
       </div>
     </div>
   );

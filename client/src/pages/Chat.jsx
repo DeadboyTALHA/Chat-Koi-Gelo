@@ -16,11 +16,12 @@ export default function Chat() {
   const [text, setText] = useState('');
   const bottomRef = useRef(null);
   const [chatName, setChatName] = useState('');
+  const [userMap, setUserMap] = useState({});
 
   // Fetch chat partner's name for DM
   useEffect(() => {
     if (type === 'dm' && id) {
-      api.get(`/people`)  // Get people list to find the user
+      api.get(`/people`)
         .then(res => {
           const person = res.data.find(p => p._id === id);
           if (person) {
@@ -44,6 +45,40 @@ export default function Chat() {
   const messages = type === 'group'
     ? (groupMessages[id] || [])
     : Object.entries(dmMessages).find(([k]) => k.includes(id))?.[1] || [];
+
+  // Build user map for display names
+  useEffect(() => {
+    const fetchUsersForMessages = async () => {
+      const userIds = [...new Set(messages.map(m => m.from).filter(uid => uid !== user?._id))];
+      if (userIds.length === 0) return;
+      
+      const newMap = { ...userMap };
+      let hasNew = false;
+      
+      for (const uid of userIds) {
+        if (!newMap[uid]) {
+          try {
+            const response = await api.get(`/people`);
+            const found = response.data.find(p => p._id === uid);
+            if (found) {
+              newMap[uid] = found.username;
+              hasNew = true;
+            }
+          } catch (err) {
+            console.error('Error fetching user:', err);
+          }
+        }
+      }
+      
+      if (hasNew) {
+        setUserMap(newMap);
+      }
+    };
+    
+    if (messages.length > 0) {
+      fetchUsersForMessages();
+    }
+  }, [messages, user?._id]);
 
   useEffect(() => {
     if (!socket) return;
@@ -92,19 +127,38 @@ export default function Chat() {
     setText('');
   };
 
+  // Function to get display name from message
+  const getDisplayName = (message) => {
+    if (message.fromUsername) return message.fromUsername;
+    if (userMap[message.from]) return userMap[message.from];
+    if (message.from === user?._id) return 'You';
+    return message.from.substring(0, 8); // Fallback: show first 8 chars of ID
+  };
+
   return (
     <div className='no-screenshot flex flex-col h-screen bg-gray-50 dark:bg-gray-900'
       onContextMenu={e => e.preventDefault()}>
       {/* Header with working back button */}
       <div className='bg-primary text-white px-4 py-3 flex items-center gap-3'>
-        <ArrowLeft className='cursor-pointer' onClick={() => navigate('/people')} />
-        <span className='font-bold'>{chatName || (type === 'group' ? 'Group Chat' : 'Loading...')}</span>
+        <button 
+          onClick={() => navigate('/people')}
+          className='cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center p-1 rounded hover:bg-white/10'
+          aria-label="Go back"
+        >
+          <ArrowLeft size={22} />
+        </button>
+        <span className='font-bold text-lg'>{chatName || (type === 'group' ? 'Group Chat' : 'Loading...')}</span>
       </div>
 
       {/* Messages */}
       <div className='flex-1 overflow-y-auto px-4 py-3 space-y-2'>
         {messages.map((m, i) => (
-          <MessageBubble key={i} message={m} isOwn={m.from === user?._id} />
+          <MessageBubble 
+            key={i} 
+            message={m} 
+            isOwn={m.from === user?._id}
+            displayName={getDisplayName(m)}
+          />
         ))}
         <div ref={bottomRef} />
       </div>

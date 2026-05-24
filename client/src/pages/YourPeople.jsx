@@ -52,7 +52,10 @@ export default function YourPeople() {
           <button onClick={toggleDarkMode} className='text-white'>
             {darkMode ? <Sun size={22} /> : <Moon size={22} />}
           </button>
-          <button onClick={handleLogout} className='text-sm bg-white text-primary px-3 py-1 rounded-full font-semibold'>
+          <button 
+            onClick={handleLogout} 
+            className='text-sm bg-white dark:bg-gray-700 text-primary dark:text-white px-3 py-1 rounded-full font-semibold hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors'
+          >
             Logout
           </button>
         </div>
