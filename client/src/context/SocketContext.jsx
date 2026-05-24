@@ -11,10 +11,19 @@ export function SocketProvider({ children }) {
 
   useEffect(() => {
     if (!user) return;
-    const s = io(import.meta.env.VITE_SOCKET_URL, { withCredentials: true });
+    
+    // Use Render backend URL in production, localhost in development
+    const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+    
+    const s = io(SOCKET_URL, { 
+      withCredentials: true,
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+    });
     socketRef.current = s;
     setSocket(s);
-
+    
     return () => {
       s.disconnect();
     };
