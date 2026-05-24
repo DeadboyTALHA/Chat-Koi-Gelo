@@ -12,3 +12,15 @@
 body {
   @apply bg-gray-50 text-gray-900;
 }
+
+.no-screenshot {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  pointer-events: none; /* inner text only */
+}
+
+/* Re-enable pointer events for interactive children */
+.no-screenshot input, .no-screenshot button, .no-screenshot textarea {
+  pointer-events: auto;
+}
