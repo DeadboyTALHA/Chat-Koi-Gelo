@@ -37,6 +37,11 @@ app.set('io', io);   // CRITICAL — lets controllers emit socket events
 initSocket(io);
 app.use(errorHandler);
 
+// Health check endpoint for Render
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 connectDB().then(() => {
   server.listen(process.env.PORT, () =>
     console.log(`Server running on port ${process.env.PORT}`)

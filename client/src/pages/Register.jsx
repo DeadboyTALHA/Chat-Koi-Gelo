@@ -11,7 +11,15 @@ export default function Register() {
   });
   const [loading, setLoading] = useState(false);
 
-  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'username') {
+      // Convert to lowercase as user types
+      setForm({ ...form, [name]: value.toLowerCase() });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
+  };
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -25,7 +33,7 @@ export default function Register() {
     } finally { setLoading(false); }
   };
 
-  const inputCls = 'w-full border rounded-lg px-4 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-accent';
+  const inputCls = 'w-full border rounded-lg px-4 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-accent dark:bg-gray-700 dark:border-gray-600 dark:text-white';
 
   return (
     <div className='min-h-screen flex items-center justify-center bg-gray-100 px-4'>
