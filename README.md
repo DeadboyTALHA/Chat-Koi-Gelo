@@ -2,6 +2,10 @@
 
 A real-time temporary messaging web application where chat history vanishes when you close the tab.
 
+## 🌐 Live Demo
+
+Check out the live project: *[Chat Koi Gelo](https://chat-koi-gelo.vercel.app)*
+
 ## ✨ Features
 
 - **Ephemeral Messages** - Messages disappear when you close the browser tab
