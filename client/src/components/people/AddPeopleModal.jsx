@@ -7,7 +7,8 @@ export default function AddPeopleModal({ onClose }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  
+  const [searched, setSearched] = useState(false);
+
   const search = async () => {
     if (!query.trim()) {
       toast.error('Please enter a username to search');
@@ -15,14 +16,14 @@ export default function AddPeopleModal({ onClose }) {
     }
     
     setLoading(true);
+    setSearched(true);
+
     try {
       const { data } = await api.get(`/people/search?q=${query}`);
       setResults(data);
-      if (data.length === 0) {
-        toast.info('No users found');
-      }
     } catch (err) {
       toast.error(err.response?.data?.message || 'Search failed');
+      setResults([]);
     } finally {
       setLoading(false);
     }
@@ -53,7 +54,11 @@ export default function AddPeopleModal({ onClose }) {
             className='flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500'
             placeholder='Search by username...'
             value={query} 
-            onChange={e => setQuery(e.target.value)}
+            onChange={e => {
+              setQuery(e.target.value);
+              setSearched(false);
+              setResults([]);
+            }}
             onKeyDown={e => e.key === 'Enter' && search()} 
           />
           <button 
@@ -66,7 +71,7 @@ export default function AddPeopleModal({ onClose }) {
         </div>
         
         <div className='space-y-2 max-h-60 overflow-y-auto'>
-          {results.length === 0 && !loading && query && (
+          {searched && !loading && results.length === 0 && (
             <p className='text-center text-gray-500 dark:text-gray-400 py-4'>No users found</p>
           )}
           {results.map(u => (
